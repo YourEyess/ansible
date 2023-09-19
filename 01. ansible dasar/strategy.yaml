@@ -1,0 +1,11 @@
+- hosts: server_belajar
+  strategy: debug
+  tasks:
+    - copy: src=myhosts dest=/etc/hosts
+      notify: restart_tomcat
+
+    - package: name=tomcat state=present
+
+  handlers:
+    - name: restart_tomcat
+      service: name=tomcat state=restarted

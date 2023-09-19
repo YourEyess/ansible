@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: dhcp
+      routeros_command:
+        commands:
+          - /ip dhcp-server setup dhcp-server-interface=LAN dhcp-address-space=192.168.2.0/24 gateway-for-dhcp-network=192.168.2.1 address-to-give-out=192.168.2.2-192.168.2.254 dns-servers=8.8.8.8 lease-time=1800

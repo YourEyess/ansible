@@ -1,0 +1,15 @@
+---
+- name: Loop & Task Control
+  hosts: server_belajar
+  become: true
+  force_handlers: yes
+  tasks:
+    - name: Install apache
+      ansible.builtin.apt:
+        name: apache2
+        state: latest
+
+    - name: Install firewalld
+      ansible.builtin.apt:
+        name: firewalld
+        state: present

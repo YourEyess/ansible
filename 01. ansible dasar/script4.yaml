@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: Add Script
+      routeros_command:
+        commands:
+          - /system script add name=ftp-backup source={:local ftphost "10.240.0.228" :local ftpuser "tes" :local ftppassword "tes" :local ftppath "/home/backup/pop"}

@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: Add Bridge Port
+      routeros_command:
+        commands:
+          - /interface bridge port add interface=ether2

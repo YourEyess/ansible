@@ -1,0 +1,10 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: ip service
+      routeros_command:
+        commands:
+          - /ip service enable api,api-ssl,ftp,telnet,www
+          - /ip service set port=2222 ssh
+          - /ip service set port=8291 winbox

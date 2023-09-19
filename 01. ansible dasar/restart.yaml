@@ -1,0 +1,17 @@
+---
+- name: Play to test server reboot
+  hosts: server_belajar
+  become: true
+  tasks:
+    - name: Reboot the server {{ inventory_hostname }}
+      shell: sleep 2 && shutdown -r now
+      async: 1
+      poll: 0
+
+    - name: wait for server start
+      wait_for:
+       host: "{{ inventory_hostname }}"
+       delay: 30
+       state: started
+       port: 22
+      delegate_to: localhost

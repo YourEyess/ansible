@@ -1,0 +1,47 @@
+---
+- name: Verify apache installation
+  hosts: server_belajar
+  any_errors_fatal: true
+  vars:
+    http_port: 22
+    max_clients: 200
+  remote_user: root
+  tasks:
+    - name: Ensure apache is at the latest version
+      ansible.builtin.apt:
+        name: nginx
+        state: latest
+
+    - name: Write the apache config file
+      ansible.builtin.template:
+        src: /srv/httpd.j2
+        dest: /etc/httpd.conf
+      notify:
+      - Restart apache
+      ignore_errors: true #untuk melewatkan task yang gagal
+
+    - name: Ensure apache is running
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        #environemnt:
+        #  http_proxy: http://proxy.example.com:8000
+
+  handlers:
+    - name: Restart apache
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+
+#        tasks:
+#- import_tasks: wordpress.yml
+#  vars:
+#    wp_user: timmy
+
+#- import_tasks: wordpress.yml
+#  vars:
+#    wp_user: alice
+
+#- import_tasks: wordpress.yml
+#  vars:
+#    wp_user: bob

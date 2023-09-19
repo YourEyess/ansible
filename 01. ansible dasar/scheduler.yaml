@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: Add Scheduler
+      routeros_command:
+        commands:
+          - /system scheduler add name=ftp-backup start-date=2023-04-05 start-time=23:00:00 interval=7d policy=ftp,read,policy,password,sensitive,write,test,sniff,romon on-event=ftp-backup
