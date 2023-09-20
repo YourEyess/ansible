@@ -1,0 +1,9 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: Add Radius
+      routeros_command:
+        commands:
+          - /radius add service=login,ppp address=192.168.1.2 secret=arul123 authentication-port=1812 accounting-port=1813
+          - /radius add service=login,ppp address=192.168.2.2 secret=arul123 authentication-port=1812 accounting-port=1813

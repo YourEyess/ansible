@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+     - name: Change dns server
+       routeros_command:
+         commands:
+           - /ip dns set servers=202.52.12.34,103.11.97.97,43.249.143.21

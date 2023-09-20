@@ -1,0 +1,8 @@
+---
+- name: Reference a collection content using its FQCN
+  hosts: server_belajar
+  tasks:
+
+    - name: Call a module using FQCN
+      my_namespace.my_collection.my_module:
+        option1: value

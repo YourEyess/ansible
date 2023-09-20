@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: change user password admin
+      routeros_command:
+        commands:
+          - /system user set number=0 password=arul123

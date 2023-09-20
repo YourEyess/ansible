@@ -1,0 +1,150 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: Add Bridge
+      routeros_command:
+        commands:
+          - /interface bridge add name=LAN
+
+    - name: Add Bridge Port
+      routeros_command:
+        commands:
+          - /interface bridge port add interface=ether2 bridge=LAN
+          - /interface bridge port add interface=ether3 bridge=LAN
+          - /interface bridge port add interface=ether4 bridge=LAN
+          - /interface bridge port add interface=ether5 bridge=LAN
+
+    - name: Add ip interface
+      routeros_command:
+        commands:
+          - /ip address add address=192.168.3.1/24 interface=LAN
+
+    - name: Change dns server
+      routeros_command:
+        commands:
+          - /ip dns set servers=202.52.12.34,103.11.97.97,43.249.143.21
+
+    - name: Add Pool
+      routeros_command:
+        commands:
+          - /ip pool add name=sui ranges=192.168.3.1-192.168.3.254
+
+    - name: ip service
+      routeros_command:
+        commands:
+          - /ip service disable api,api-ssl,ftp,telnet,www
+          - /ip service set port=2121 ssh
+          - /ip service set port=8291 winbox
+
+    - name: Add DHCP Service
+      routeros_command:
+        commands:
+          - /ip dhcp-server add name=sui interface=LAN address-pool=sui
+
+    - name: Add Firewall
+      routeros_command:
+        commands:
+          - /ip firewall nat add chain=srcnat out-interface=ether1 action=masquerade
+
+    - name: Add Radius
+      routeros_command:
+        commands:
+          - /radius add service=login,ppp address=192.168.3.1 secret=arul123 authentication-port=1812 accounting-port=1813
+          - /radius add service=login,ppp address=192.168.3.2 secret=arul123 authentication-port=1812 accounting-port=1813
+
+    - name: AAA Authentication&Accounting
+      routeros_command:
+        commands:
+          - /user aaa set use-radius=yes accounting=yes default-group=full
+
+
+    - name: Add Script
+      routeros_command:
+        commands:
+          - /system script add name=ftp-backup source=
+            "# ftp server.\r\
+            \n:local ftphost \"10.240.0.228\"\r\
+            \n:local ftpuser \"tes\"\r\
+            \n:local ftppassword \"tes\"\r\
+            \n:local ftppath \"/home/backup/pop\"\r\
+            \n\r\
+            \n# GetDate \r\
+            \n:local GDate [/system clock get date]\r\
+            \n:local GDay [ :pick \$GDate 4 6 ]\r\
+            \n:local GMonth [ :pick \$GDate 0 3 ]\r\
+            \n:local GYear [ :pick \$GDate 7 11 ]\r\
+            \n:local GResult \"\$GDay \$GMonth \$GYear\"\r\
+            \n\r\
+            \n# file name for system backup \r\
+            \n:local BackupConf ([/system identity get name].\".backup\")\r\
+            \n:log info \$BackupConf\r\
+            \n\r\
+            \nqueue simple export file=que\r\
+            \n# file name for config export\r\
+            \n:local ExportConf ([/system identity get name].\".rsc\")\r\
+            \n:log info \$ExportConf\r\
+            \n\r\
+            \n# backup the data\r\
+            \n/system backup save name=\$BackupConf\r\
+            \n:log info message=\"System backup finished (1/2).\";\r\
+            \n/export compact file=\$ExportConf\r\
+            \n:log info message=\"Config export finished (2/2).\"\r\
+            \n\r\
+            \n# upload the system backup\r\
+            \n:log info message=\"Uploading system backup (1/2).\"\r\
+            \n/tool fetch address=\"\$ftphost\" src-path=\$BackupConf user=\"\$ftpuser\" mode=ftp password=\"\$ftppassword\" dst-pat>
+            \n\r\
+            \n# upload the config export\r\
+            \n:log info message=\"Uploading config export (2/2).\"\r\
+            \n/tool fetch address=\"\$ftphost\" src-path=\$ExportConf user= \"\$ftpuser\" mode=ftp password=\"\$ftppassword\" dst-pa>
+            \n\r\
+            \n# delay time to finish the upload - increase it if your backup file is big:delay 10s;\r\
+            \n\r\
+            \n:log info message=\"Configuration backup finished.\";\r\
+            \n\r\
+            \n:local ts [/system clock get time]\r\
+            \n:set ts ([:pick \$ts 0 2].[:pick \$ts 3 5].[:pick \$ts 6 8])\r\
+            \n\r\
+            \n:local ds [/system clock get date]\r\
+            \n:set ds ([:pick \$ds 7 11].[:pick \$ds 0 3].[:pick \$ds 4 6])\r\
+            \n\r\
+            \n:local fname (\"BACKUP-\".[/system identity get name].\"-\".\$ds.\"-\".\$ts)\r\
+            \n:local sfname (\"/\".\$fname)\r\
+            \n\r\
+            \n:if (\$saveUserDB) do={\r\
+            \n  /tool user-manager database save name=(\$sfname.\".umb\")\r\
+            \n  :log info message=\"User Manager DB Backup Finished\"\r\
+            \n}\r\
+            \n\r\
+            \n:if (\$saveSysBackup) do={\r\
+            \n  :if (\$encryptSysBackup = true) do={ /system backup save name=(\$sfname.\".backup\") }\r\
+            \n  :if (\$encryptSysBackup = false) do={ /system backup save dont-encrypt=yes name=(\$sfname.\".backup\") }\r\
+            \n  :log info message=\"System Backup Finished\"\r\
+            \n}\r\
+            \n\r\
+            \nif (\$saveRawExport) do={\r\
+            \n  /export file=(\$sfname.\".rsc\")\r\
+            \n  :log info message=\"Raw configuration script export Finished\"\r\
+            \n}\r\
+            \n\r\
+            \n:local backupFileName \"\"\r\
+            \n\r\
+            \n:foreach backupFile in=[/file find] do={\r\
+            \n  :set backupFileName (\"/\".[/file get \$backupFile name])\r\
+            \n  :if ([:typeof [:find \$backupFileName \$sfname]] != \"nil\") do={\r\
+            \n    /tool fetch address=\$FTPServer port=\$FTPPort src-path=\$backupFileName user=\$FTPUser mode=ftp password=\$FTPPas>
+            \n  }\r\
+            \n}\r\
+            \n\r\
+            \n:delay 5s\r\
+            \n\r\
+            \n:foreach backupFile in=[/file find] do={\r\
+            \n  :if ([:typeof [:find [/file get \$backupFile name] \"BACKUP-\"]]!=\"nil\") do={\r\
+            \n    /file remove \$backupFile\r\
+            \n  }\r\
+            \n}\r\
+            \n\r\
+            \n:log info message=\"Successfully removed Temporary Backup Files\"\r\
+            \n:log info message=\"Automatic Backup Completed Successfully\"\r\
+            "

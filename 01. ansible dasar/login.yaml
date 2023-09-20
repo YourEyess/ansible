@@ -1,0 +1,8 @@
+---
+- hosts: server_belajar
+  become: true
+  tasks:
+    - name: AAA Authentication&Accounting
+      routeros_command:
+        commands:
+          - /user aaa set use-radius=yes accounting=yes default-group=full
