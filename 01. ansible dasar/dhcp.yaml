@@ -1,8 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  tasks:
-    - name: DHCP Server Setup
-      routeros_command:
-        commands:
-          - /ip dhcp-server setup dhcp-server-interface={{dhcp_server_interface}} dhcp-address-space={{dhcp_address_space}} gateway-for-dhcp-network={{gateway_for_dhcp_network}} address-to-give-out={{address_to_give_out}} dns-server={{dns_server}}

@@ -1,8 +1,0 @@
----
-- name: ping module demo
-  hosts: server_belajar
-  become: false
-
-  tasks:
-    - name: test connection
-      ping:

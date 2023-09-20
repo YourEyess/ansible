@@ -1,8 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  tasks:
-    - name: Change ssh port to 22
-      routeros_command:
-        commands:
-          - /ip service set port=22 ssh

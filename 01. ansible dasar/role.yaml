@@ -1,7 +1,0 @@
----
-- hosts: webservers
-  roles:
-    - role: foo
-      message: "first"
-    - role: foo
-      message: "second"

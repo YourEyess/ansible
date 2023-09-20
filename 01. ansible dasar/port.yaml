@@ -1,9 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  become_method: sudo
-  tasks:
-    - name: add port
-      routeros_command:
-        commands:
-          - /ip dns set servers=8.8.8.8

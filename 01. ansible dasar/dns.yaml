@@ -1,8 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  tasks:
-     - name: Change dns server
-       routeros_command:
-         commands:
-           - /ip dns set servers=8.8.8.8

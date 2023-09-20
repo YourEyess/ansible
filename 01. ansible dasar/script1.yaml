@@ -1,8 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  tasks:
-    - name: Add Script
-      routeros_command:
-        commands:
-          - /system script add name=ftp-backup source={yayaya}

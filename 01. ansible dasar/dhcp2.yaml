@@ -1,8 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  tasks:
-    - name: Add DHCP Service
-      routeros_command:
-        commands:
-          - /ip dhcp-server add name=sui interface=LAN address-pool=sui

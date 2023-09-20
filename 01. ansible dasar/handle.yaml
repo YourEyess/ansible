@@ -1,8 +1,0 @@
-- hosts: server_belajar
-  debugger: on_failed
-  gather_facts: false
-  vars:
-    var1: value1
-  tasks:
-    - name: Use a wrong variable
-      ansible.builtin.ping: data={{ wrong_var }} # {{ var1 }} = yang bener

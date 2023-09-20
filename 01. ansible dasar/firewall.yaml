@@ -1,8 +1,0 @@
----
-- hosts: server_belajar
-  become: true
-  tasks:
-    - name: Add Firewall
-      routeros_command:
-      commands:
-        - /ip firewall nat chain=srcnat out-interface=ether1 action=masquerade
